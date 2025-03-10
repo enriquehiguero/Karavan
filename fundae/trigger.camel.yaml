@@ -4,7 +4,7 @@
       - id: post-1ed2
         description: Trigger Student
         path: /student
-        to: direct:proccessorTrigger
+        to: direct:route-fc41
         consumes: application/x-www-form-urlencoded
         produces: application/json
 - route:
