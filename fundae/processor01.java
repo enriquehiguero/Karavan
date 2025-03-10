@@ -1,16 +1,12 @@
 import org.apache.camel.BindToRegistry;
-import org.apache.camel.Configuration;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import java.util.HashMap;
 
-@Configuration
 @BindToRegistry("processor01")
 public class processor01 implements Processor {
-
     public void process(Exchange exchange) throws Exception {
-       // Obtener el cuerpo directamente como HashMap
-
+        // Obtener el cuerpo directamente como HashMap
         HashMap<String, String> body = exchange.getIn().getBody(HashMap.class);
         if (body != null) {
             // Acceder a valores específicos
@@ -21,7 +17,8 @@ public class processor01 implements Processor {
             // Establecer una nueva propiedad
             exchange.setProperty("Identificator", property01 + "|" + property02);
         } else {
-
+            // Opcional: Manejar el caso cuando body es null
+            throw new IllegalArgumentException("Body is null or not a HashMap");
         }
     }
 }
