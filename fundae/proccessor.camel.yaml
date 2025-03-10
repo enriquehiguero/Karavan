@@ -1,0 +1,40 @@
+- route:
+    id: route-fc41
+    nodePrefixId: route-509
+    from:
+      id: from-2eea
+      uri: direct
+      steps:
+        - to:
+            id: to-7ef9
+            description: Log de pruebas
+            uri: log
+            parameters:
+              loggerName: logger01
+              showAllProperties: true
+              showAll: true
+              showHeaders: true
+              showProperties: true
+        - process:
+            id: process-fc50
+            ref: processor01
+        - to:
+            id: to-b40f
+            uri: log
+            parameters:
+              showAll: true
+              showAllProperties: true
+              loggerName: logger02
+              showHeaders: true
+              showProperties: true
+        - setBody:
+            id: setBody-84e2
+            expression:
+              csimple:
+                id: csimple-db1e
+                expression: |-
+                  {
+                    "Data01": "${property.P_property01}",
+                    "Data02": "${property.P_property02}",
+                    "Identificator": "${property.Identificator}"
+                  }

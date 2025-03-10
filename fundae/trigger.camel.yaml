@@ -1,0 +1,9 @@
+- rest:
+    id: rest-5fea
+    post:
+      - id: post-1ed2
+        description: Trigger Student
+        path: /student
+        to: direct:proccessor
+        consumes: application/x-www-form-urlencoded
+        produces: application/json
