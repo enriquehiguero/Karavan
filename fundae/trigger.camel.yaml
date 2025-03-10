@@ -45,7 +45,7 @@
                 id: csimple-db1e
                 expression: |-
                   {
-                    "Data01": "${property.P_property01}",
-                    "Data02": "${property.P_property02}",
-                    "Identificator": "${property.Identificator}"
+                    "Data01": "${exchangeProperty.P_property01}",
+                    "Data02": "${exchangeProperty.P_property02}",
+                    "Identificator": "${exchangeProperty.Identificator}"
                   }
