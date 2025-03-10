@@ -13,6 +13,8 @@
     from:
       id: from-2eea
       uri: direct
+      parameters:
+        name: route-fc41
       steps:
         - to:
             id: to-7ef9
