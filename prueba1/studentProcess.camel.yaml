@@ -1,0 +1,67 @@
+- rest:
+    id: rest-5fea
+    post:
+      - id: post-1ed2
+        description: Trigger Student
+        path: /student
+        to: direct:route-fc41
+        consumes: application/x-www-form-urlencoded
+        produces: application/json
+- route:
+    id: route-token
+    description: "Obtención de los "
+    nodePrefixId: route-509
+    from:
+      id: from-2eea
+      uri: direct
+      parameters:
+        name: route-fc41
+      steps:
+        - to:
+            id: to-7ef9
+            description: Log de pruebas
+            uri: log
+            parameters:
+              loggerName: logger01
+              showAllProperties: true
+              showAll: true
+              showHeaders: true
+              showProperties: true
+        - choice:
+            id: choice-7d10
+            when:
+              - id: when-d1bf
+                expression:
+                  csimple:
+                    id: csimple-962b
+                    expression: >-
+                      "${properties:globalAccessToken} == null ||
+                      ${date:now:yyyy-MM-dd'T'HH:mm:ssZ} >
+                      ${properties:globalTokenExpiration}"
+            otherwise:
+              id: otherwise-16cc
+              log:
+                message: "Token existente: ${properties:globalAccessToken}"
+        - process:
+            id: process-fc50
+            ref: processor01
+        - to:
+            id: to-b40f
+            uri: log
+            parameters:
+              showAll: true
+              showAllProperties: true
+              loggerName: logger02
+              showHeaders: true
+              showProperties: true
+        - setBody:
+            id: setBody-84e2
+            expression:
+              csimple:
+                id: csimple-db1e
+                expression: |-
+                  {
+                    "Data01": "${exchangeProperty.P_property01}",
+                    "Data02": "${exchangeProperty.P_property02}",
+                    "Identificator": "${exchangeProperty.Identificator}"
+                  }
