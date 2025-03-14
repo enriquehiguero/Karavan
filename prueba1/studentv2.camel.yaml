@@ -37,16 +37,6 @@
                         name: get-token
             otherwise:
               id: otherwise-e950
-              log:
-                message: "Usando token existente: ${properties:globalAccessToken}"
-        - to:
-            id: to-f971
-            uri: https
-            parameters:
-              method: GET
-              headers:
-                authorization: Bearer ${properties:globalAccessToken}
-              httpUri: equipoivis.lms.sapsf.eu/learning/api/rest/v1/students
         - log:
             id: log-4629
             message: "Estudiantes procesados: ${body}"
