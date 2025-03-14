@@ -1,8 +1,0 @@
-services:
-  prueba1:
-    image: prueba1
-    restart: always
-    ports:
-      - "8082:8080"
-    networks:
-      - karavan
