@@ -1,0 +1,45 @@
+- route:
+    id: get-token
+    from:
+      id: from-5243
+      uri: direct
+      parameters:
+        name: get-token
+      steps:
+        - log:
+            id: log-9251
+            message: Obteniendo token
+        - to:
+            id: to-ec34
+            uri: https
+            parameters:
+              method: POST
+              headers:
+                contentType: application/json
+                authorization: >-
+                  Basic
+                  ZXF1aXBvaXZpczowOWMwN2ZjNGNmMGY1MmUwZDU5NWE5YmEyYTY2NGI2MWE5Y2IwNjI0YWM3ZTRhNzA0MjA3ZDBlMjUzM2NjNGNkMjUyNzM4MzdlMzZjMDk0YjNiZmY2MDIyMzI2NmYzMGM=
+              body: |
+                {
+                  "grant_type": "client_credentials",
+                  "scope": {
+                    "userId": "10100043",
+                    "companyId": "equipoivis",
+                    "userType": "user",
+                    "resourceType": "learning_public_api"
+                  }
+                }
+              httpUri: equipoivis.lms.sapsf.eu/learning/oauth-api/rest/v1/token
+        - setProperty:
+            id: setProperty-d368
+            name: tempToken
+            expression:
+              simple:
+                id: simple-0b9a
+                expression: ${body.access_token}
+        - to:
+            id: to-8890
+            uri: properties
+        - log:
+            id: log-a6cd
+            message: "Token guardado: ${properties:globalAccessToken}"

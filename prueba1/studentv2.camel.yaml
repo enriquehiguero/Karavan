@@ -1,0 +1,43 @@
+- route:
+    id: process-students
+    from:
+      id: from-4855
+      uri: direct
+      parameters:
+        name: process-students
+      steps:
+        - log:
+            id: log-cd0c
+            message: Procesando estudiantes
+        - choice:
+            id: choice-dc8a
+            when:
+              - id: when-153d
+                expression:
+                  simple:
+                    id: simple-5794
+                    expression: ${properties:globalAccessToken} == null
+                steps:
+                  - log:
+                      id: log-a37d
+                      message: Token no disponible, obteniendo nuevo
+                  - to:
+                      id: to-37a8
+                      uri: direct
+                      parameters:
+                        name: get-token
+            otherwise:
+              id: otherwise-3bef
+              log:
+                message: "Usando token existente: ${properties:globalAccessToken}"
+        - to:
+            id: to-5e14
+            uri: https
+            parameters:
+              method: GET
+              headers:
+                authorization: Bearer ${properties:globalAccessToken}
+              httpUri: equipoivis.lms.sapsf.eu/learning/api/rest/v1/students
+        - log:
+            id: log-fe3e
+            message: "Estudiantes procesados: ${body}"
