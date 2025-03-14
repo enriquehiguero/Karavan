@@ -1,11 +1,12 @@
 - rest:
-    id: rest-students
+    id: rest-5fea
     post:
-      - id: post-cae7
+      - id: post-1ed2
+        description: Trigger Student
+        path: /studentV2
         to: direct:process-students
         consumes: application/json
         produces: application/json
-        uri: /studentsV2
 - route:
     id: process-students
     from:
