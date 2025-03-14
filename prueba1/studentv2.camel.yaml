@@ -1,46 +1,43 @@
 - rest:
-    id: rest-5fea
+    id: rest-students
     post:
-      - id: post-1ed2
-        description: Trigger Student
-        path: /studentV2
+      - id: post-cae7
         to: direct:process-students
-        consumes: application/json
-        produces: application/json
+        uri: /studentsV2
 - route:
     id: process-students
     from:
-      id: from-4855
+      id: from-0c29
       uri: direct
       parameters:
         name: process-students
       steps:
         - log:
-            id: log-cd0c
+            id: log-4921
             message: Procesando estudiantes
         - choice:
-            id: choice-dc8a
+            id: choice-efbc
             when:
-              - id: when-153d
+              - id: when-1583
                 expression:
                   simple:
-                    id: simple-5794
+                    id: simple-2e41
                     expression: ${properties:globalAccessToken} == null
                 steps:
                   - log:
-                      id: log-a37d
+                      id: log-ea2b
                       message: Token no disponible, obteniendo nuevo
                   - to:
-                      id: to-37a8
+                      id: to-78b9
                       uri: direct
                       parameters:
                         name: get-token
             otherwise:
-              id: otherwise-3bef
+              id: otherwise-e950
               log:
                 message: "Usando token existente: ${properties:globalAccessToken}"
         - to:
-            id: to-5e14
+            id: to-f971
             uri: https
             parameters:
               method: GET
@@ -48,5 +45,5 @@
                 authorization: Bearer ${properties:globalAccessToken}
               httpUri: equipoivis.lms.sapsf.eu/learning/api/rest/v1/students
         - log:
-            id: log-fe3e
+            id: log-4629
             message: "Estudiantes procesados: ${body}"
