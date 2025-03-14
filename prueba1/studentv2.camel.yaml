@@ -3,6 +3,8 @@
     post:
       - id: post-cae7
         to: direct:process-students
+        consumes: application/json
+        produces: application/json
         uri: /studentsV2
 - route:
     id: process-students
