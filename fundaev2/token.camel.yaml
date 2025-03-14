@@ -13,7 +13,6 @@
             id: to-ec34
             uri: https
             parameters:
-              method: POST
               headers:
                 contentType: application/json
                 authorization: >-
@@ -30,6 +29,7 @@
                   }
                 }
               httpUri: equipoivis.lms.sapsf.eu/learning/oauth-api/rest/v1/token
+              httpMethod: POST
         - setProperty:
             id: setProperty-d368
             name: tempToken
