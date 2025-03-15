@@ -5,41 +5,54 @@
         path: /studentV2
         to: direct:process-students
 - route:
-    id: process-students
+    id: route-3b6e
+    nodePrefixId: route-77f
     from:
-      id: from-798a
+      id: from-f8a1
       uri: direct
       parameters:
         name: process-students
       steps:
         - log:
-            id: log-8fbb
+            id: log-a4bc
             message: Procesando estudiantes
         - choice:
-            id: choice-efdd
+            id: choice-e19e
             when:
-              - id: when-f634
+              - id: when-b4d2
                 expression:
                   simple:
-                    id: simple-ee17
-                    expression: ${properties:globalAccessToken} == null
+                    id: simple-a81c
+                    expression: ${exchangeProperty.globalAccessToken} == null
                 steps:
                   - log:
-                      id: log-1457
+                      id: log-bfb4
                       message: Token no disponible, obteniendo nuevo
                   - to:
-                      id: to-e99a
+                      id: to-0719
                       uri: direct
                       parameters:
                         name: get-token
             otherwise:
-              id: otherwise-ab90
-              log:
-                message: "Usando token existente: ${properties:globalAccessToken}"
+              id: otherwise-73de
+              steps:
+                - log:
+                    id: log-0466
+                    message: >-
+                      Usando token existente:
+                      ${exchangeProperty.globalAccessToken}
+        - setBody:
+            id: setBody-c083
+            expression:
+              simple:
+                id: simple-6323
+                expression: >-
+                  {"status": "success", "token":
+                  "${exchangeProperty.globalAccessToken}", "students": ${body}}
         - log:
-            id: log-cfd4
-            message: "Estudiantes procesados: ${body}"
+            id: log-0862
+            message: "Respuesta preparada: ${body}"
         - marshal:
-            id: marshal-0669
+            id: marshal-4db5
             json:
-              id: json-8063
+              id: json-7daa
