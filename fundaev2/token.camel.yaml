@@ -1,18 +1,19 @@
 - route:
     id: get-token
     from:
-      id: from-5243
+      id: from-9ecd
       uri: direct
       parameters:
         name: get-token
       steps:
         - log:
-            id: log-9251
+            id: log-fd19
             message: Obteniendo token
         - to:
-            id: to-ec34
+            id: to-6d84
             uri: https
             parameters:
+              method: POST
               headers:
                 contentType: application/json
                 authorization: >-
@@ -29,17 +30,16 @@
                   }
                 }
               httpUri: equipoivis.lms.sapsf.eu/learning/oauth-api/rest/v1/token
-              httpMethod: POST
         - setProperty:
-            id: setProperty-d368
+            id: setProperty-7af6
             name: tempToken
             expression:
               simple:
-                id: simple-0b9a
+                id: simple-b7f9
                 expression: ${body.access_token}
         - to:
-            id: to-8890
+            id: to-092d
             uri: properties
         - log:
-            id: log-a6cd
+            id: log-9c5a
             message: "Token guardado: ${properties:globalAccessToken}"
