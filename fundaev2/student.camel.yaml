@@ -1,42 +1,45 @@
 - rest:
-    id: rest-5fea
+    id: rest-students
     post:
-      - id: post-1ed2
-        description: Trigger Student
+      - id: post-d5af
         path: /studentV2
         to: direct:process-students
-        consumes: application/json
-        produces: application/json
 - route:
     id: process-students
     from:
-      id: from-0c29
+      id: from-798a
       uri: direct
       parameters:
         name: process-students
       steps:
         - log:
-            id: log-4921
+            id: log-8fbb
             message: Procesando estudiantes
         - choice:
-            id: choice-efbc
+            id: choice-efdd
             when:
-              - id: when-1583
+              - id: when-f634
                 expression:
                   simple:
-                    id: simple-2e41
+                    id: simple-ee17
                     expression: ${properties:globalAccessToken} == null
                 steps:
                   - log:
-                      id: log-ea2b
+                      id: log-1457
                       message: Token no disponible, obteniendo nuevo
                   - to:
-                      id: to-78b9
+                      id: to-e99a
                       uri: direct
                       parameters:
                         name: get-token
             otherwise:
-              id: otherwise-e950
+              id: otherwise-ab90
+              log:
+                message: "Usando token existente: ${properties:globalAccessToken}"
         - log:
-            id: log-4629
+            id: log-cfd4
             message: "Estudiantes procesados: ${body}"
+        - marshal:
+            id: marshal-0669
+            json:
+              id: json-8063

@@ -1,45 +1,62 @@
 - route:
     id: get-token
     from:
-      id: from-9ecd
+      id: from-f77b
       uri: direct
       parameters:
         name: get-token
       steps:
         - log:
-            id: log-fd19
+            id: log-396c
             message: Obteniendo token
-        - to:
-            id: to-6d84
-            uri: https
-            parameters:
-              method: POST
-              headers:
-                contentType: application/json
-                authorization: >-
+        - setHeader:
+            id: setHeader-b437
+            name: Content-Type
+            expression:
+              constant:
+                id: constant-2e62
+                expression: application/json
+        - setHeader:
+            id: setHeader-2ba3
+            name: Authorization
+            expression:
+              constant:
+                id: constant-3b6f
+                expression: >-
                   Basic
                   ZXF1aXBvaXZpczowOWMwN2ZjNGNmMGY1MmUwZDU5NWE5YmEyYTY2NGI2MWE5Y2IwNjI0YWM3ZTRhNzA0MjA3ZDBlMjUzM2NjNGNkMjUyNzM4MzdlMzZjMDk0YjNiZmY2MDIyMzI2NmYzMGM=
-              body: |
-                {
-                  "grant_type": "client_credentials",
-                  "scope": {
-                    "userId": "10100043",
-                    "companyId": "equipoivis",
-                    "userType": "user",
-                    "resourceType": "learning_public_api"
-                  }
-                }
-              httpUri: equipoivis.lms.sapsf.eu/learning/oauth-api/rest/v1/token
+        - setBody:
+            id: setBody-8947
+            expression:
+              constant:
+                id: constant-ded1
+                expression: >-
+                  {"grant_type": "client_credentials", "scope": {"userId":
+                  "10100043", "companyId": "equipoivis", "userType": "user",
+                  "resourceType": "learning_public_api"}}
+        - setHeader:
+            id: setHeader-2761
+            name: CamelHttpPath
+            expression:
+              constant:
+                id: constant-c501
+        - to:
+            id: to-20d8
+            uri: https
+            parameters:
+              httpUri: >-
+                equipoivis.lms.sapsf.eu/learning/oauth-api/rest/v1/token?httpMethod=POST&bridgeEndpoint=true
+        - unmarshal:
+            id: unmarshal-989d
+            json:
+              id: json-88cd
         - setProperty:
-            id: setProperty-7af6
-            name: tempToken
+            id: setProperty-6441
+            name: globalAccessToken
             expression:
               simple:
-                id: simple-b7f9
-                expression: ${body.access_token}
-        - to:
-            id: to-092d
-            uri: properties
+                id: simple-0122
+                expression: ${body[access_token]}
         - log:
-            id: log-9c5a
-            message: "Token guardado: ${properties:globalAccessToken}"
+            id: log-e459
+            message: "Token guardado: ${exchangeProperty.globalAccessToken}"
