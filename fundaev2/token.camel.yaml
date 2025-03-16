@@ -32,7 +32,7 @@
                 id: constant-ded1
                 expression: >-
                   {"grant_type": "client_credentials", "scope": {"userId":
-                  "10100043", "companyId": "equipoivis", "userType": "user",
+                  "PLATEAU", "companyId": "equipoivis", "userType": "user",
                   "resourceType": "learning_public_api"}}
         - setHeader:
             id: setHeader-2761
