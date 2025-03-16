@@ -42,17 +42,21 @@
                       Usando token existente:
                       ${exchangeProperty.globalAccessToken}
         - setBody:
-            id: setBody-c083
+            id: setBody-64b1
             expression:
               simple:
-                id: simple-6323
+                id: simple-aa41
                 expression: >-
                   {"status": "success", "token":
-                  "${exchangeProperty.globalAccessToken}", "students": ${body}}
+                  "${exchangeProperty.globalAccessToken}"}
         - log:
-            id: log-0862
+            id: log-75c4
             message: "Respuesta preparada: ${body}"
         - marshal:
-            id: marshal-4db5
+            id: marshal-0071
             json:
-              id: json-7daa
+              id: json-7ed5
+        - unmarshal:
+            id: unmarshal-e841
+            json:
+              id: json-1485
