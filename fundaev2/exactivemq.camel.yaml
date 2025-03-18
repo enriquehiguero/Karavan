@@ -1,0 +1,66 @@
+- route:
+    id: split-and-send-to-activemq
+    from:
+      id: from-3144
+      uri: direct
+      parameters:
+        name: start
+      steps:
+        - unmarshal:
+            id: unmarshal-2efe
+            json:
+              id: json-7c40
+        - split:
+            id: split-e87a
+            expression:
+              simple:
+                id: simple-9c8e
+                expression: "\"${body}\""
+            steps:
+              - setBody:
+                  id: setBody-e479
+                  expression:
+                    simple:
+                      id: simple-0508
+                      expression: "\"{\\\"employeeId\\\": \\\"${body.id}\\\"}\""
+              - to:
+                  id: to-e6b1
+                  uri: activemq
+                  parameters:
+                    destinationName: activemq:queue:employeeTokenQueue
+              - log:
+                  id: log-860e
+                  message: "Enviado a ActiveMQ: ${body}"
+- route:
+    id: consume-and-get-token
+    from:
+      id: from-5310
+      uri: activemq
+      parameters:
+        destinationType: queue
+        destinationName: employeeTokenQueue
+      steps:
+        - setBody:
+            id: setBody-4875
+            expression:
+              simple:
+                id: simple-c111
+                expression: >-
+                  "company_id=nttdataeurD&client_id=MzEzMWViMTUzMWE2YzhlNzJhMDFlNWRhYzBmNw&grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&user_id=ADMINT4S&assertion=PD9=&employee_id=${body.employeeId}"
+        - setHeader:
+            id: setHeader-78a2
+            name: header
+            expression:
+              simple:
+                id: simple-c91e
+                expression: |-
+                  name: "Content-Type"
+                  simple: "application/x-www-form-urlencoded"
+        - to:
+            id: to-681f
+            uri: http
+            parameters:
+              httpUri: api55.sapsf.eu/oauth/token?httpMethod=POST
+        - log:
+            id: log-c5f5
+            message: "\"Token recibido para empleado ${body.employeeId}: ${body}\""
