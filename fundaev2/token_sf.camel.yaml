@@ -1,59 +1,62 @@
 - route:
     id: get-successfactors-token
     from:
-      id: from-682f
+      id: from-a938
       uri: direct
       parameters:
         name: start
       steps:
         - setBody:
-            id: setBody-9a9b
+            id: setBody-ecf8
             expression:
               simple:
-                id: simple-ac78
+                id: simple-fcda
                 expression: >-
                   client_id=MzEzMWViMTUzMMDFlNWRhYzBmNw&user_id=ADMINT4S&token_url=https://api55.sapsf.eu/oauth/token&private_key=TUlJRXZRSUE
         - setHeader:
-            id: setHeader-706c
+            id: setHeader-219d
             name: Content-Type
             expression:
               simple:
-                id: simple-b7eb
+                id: simple-8954
                 expression: application/x-www-form-urlencoded
         - to:
-            id: to-9b2b
+            id: to-4359
             uri: http
             parameters:
               httpUri: api55.sapsf.eu/oauth/idp?httpMethod=POST
         - log:
-            id: log-d441
+            id: log-7b29
             message: "Cookie response: ${body}"
         - setBody:
-            id: setBody-39e7
+            id: setBody-b4fc
             expression:
               simple:
-                id: simple-999c
+                id: simple-4ed2
                 expression: >-
                   company_id=nttdataeurD&client_id=MzEzMWViMTUzMWE2YzhlNzJhMDFlNWRhYzBmNw&grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&user_id=ADMINT4S&assertion=PD9=
         - setHeader:
-            id: setHeader-d2e4
+            id: setHeader-40c7
             name: Content-Type
             expression:
               simple:
-                id: simple-5f97
+                id: simple-04d9
                 expression: application/x-www-form-urlencoded
-        - to:
-            id: to-8a43
-            uri: http
-            parameters:
-              httpUri: api55.sapsf.eu/oauth/token?httpMethod=POST
-        - log:
-            id: log-3e2f
-            message: "Token response: ${body}"
-    onException:
-      exception: java.lang.Exception
-      handled:
-        constant: "true"
-      steps:
-        - log:
-            message: "Error en la ruta: ${exception.message}"
+        - doTry:
+            id: doTry-880f
+            doCatch:
+              - id: doCatch-459c
+                exception: java.lang.Exception
+                steps:
+                  - log:
+                      id: log-1626
+                      message: "Error en la ruta: ${exception.message}"
+            steps:
+              - to:
+                  id: to-edda
+                  uri: http
+                  parameters:
+                    httpUri: api55.sapsf.eu/oauth/token?httpMethod=POST
+              - log:
+                  id: log-f594
+                  message: "Token response: ${body}"
