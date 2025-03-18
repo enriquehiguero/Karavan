@@ -55,7 +55,7 @@
             uri: https
             parameters:
               httpUri: >-
-                equipoivis.lms.sapsf.eu/learning/odatav4/searchStudent/v1/Students?httpMethod=GET&bridgeEndpoint=true
+                equipoivis.lms.sapsf.eu/learning/odatav4/searchStudent/v1/Students?$top=1000&httpMethod=GET&bridgeEndpoint=true
         - setBody:
             id: setBody-5b24
             expression:

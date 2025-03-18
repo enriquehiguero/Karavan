@@ -8,7 +8,12 @@
       steps:
         - log:
             id: log-396c
-            message: Obteniendo token
+            message: >-
+              Obteniendo token:
+
+              {"grant_type": "client_credentials", "scope": {"userId":
+              "PLATEAU", "companyId": "${properties:sf.company_id}", "userType":
+              "admin", "resourceType": "learning_public_api"}}
         - setHeader:
             id: setHeader-b437
             name: Content-Type
@@ -28,12 +33,15 @@
         - setBody:
             id: setBody-8947
             expression:
-              constant:
-                id: constant-ded1
+              simple:
+                id: simple-facb
                 expression: >-
                   {"grant_type": "client_credentials", "scope": {"userId":
-                  "PLATEAU", "companyId": "equipoivis", "userType": "admin",
-                  "resourceType": "learning_public_api"}}
+                  "PLATEAU", "companyId": "${properties:sf.company_id}",
+                  "userType": "admin", "resourceType": "learning_public_api"}}
+        - log:
+            id: log-d67d
+            message: "mi body es: ${body}"
         - setHeader:
             id: setHeader-2761
             name: CamelHttpPath

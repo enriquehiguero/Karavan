@@ -1,0 +1,62 @@
+- route:
+    id: get-successfactors-token
+    from:
+      id: from-a938
+      uri: direct
+      parameters:
+        name: start
+      steps:
+        - setBody:
+            id: setBody-ecf8
+            expression:
+              simple:
+                id: simple-fcda
+                expression: >-
+                  client_id=MzEzMWViMTUzMMDFlNWRhYzBmNw&user_id=ADMINT4S&token_url=https://api55.sapsf.eu/oauth/token&private_key=TUlJRXZRSUE
+        - setHeader:
+            id: setHeader-219d
+            name: Content-Type
+            expression:
+              simple:
+                id: simple-8954
+                expression: application/x-www-form-urlencoded
+        - to:
+            id: to-4359
+            uri: http
+            parameters:
+              httpUri: api55.sapsf.eu/oauth/idp?httpMethod=POST
+        - log:
+            id: log-7b29
+            message: "Cookie response: ${body}"
+        - setBody:
+            id: setBody-b4fc
+            expression:
+              simple:
+                id: simple-4ed2
+                expression: >-
+                  company_id=nttdataeurD&client_id=MzEzMWViMTUzMWE2YzhlNzJhMDFlNWRhYzBmNw&grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&user_id=ADMINT4S&assertion=PD9=
+        - setHeader:
+            id: setHeader-40c7
+            name: Content-Type
+            expression:
+              simple:
+                id: simple-04d9
+                expression: application/x-www-form-urlencoded
+        - doTry:
+            id: doTry-880f
+            doCatch:
+              - id: doCatch-459c
+                exception: java.lang.Exception
+                steps:
+                  - log:
+                      id: log-1626
+                      message: "Error en la ruta: ${exception.message}"
+            steps:
+              - to:
+                  id: to-edda
+                  uri: http
+                  parameters:
+                    httpUri: api55.sapsf.eu/oauth/token?httpMethod=POST
+              - log:
+                  id: log-f594
+                  message: "Token response: ${body}"
