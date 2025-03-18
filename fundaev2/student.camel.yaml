@@ -1,62 +1,69 @@
 - rest:
     id: rest-students
     post:
-      - id: post-d5af
+      - id: post-fa87
         path: /studentV2
         to: direct:process-students
 - route:
-    id: route-3b6e
-    nodePrefixId: route-77f
+    id: process-students
     from:
-      id: from-f8a1
+      id: from-d0d1
       uri: direct
       parameters:
         name: process-students
       steps:
         - log:
-            id: log-a4bc
+            id: log-7ab5
             message: Procesando estudiantes
         - choice:
-            id: choice-e19e
+            id: choice-22fb
             when:
-              - id: when-b4d2
+              - id: when-de4e
                 expression:
                   simple:
-                    id: simple-a81c
+                    id: simple-2538
                     expression: ${exchangeProperty.globalAccessToken} == null
                 steps:
                   - log:
-                      id: log-bfb4
+                      id: log-761a
                       message: Token no disponible, obteniendo nuevo
                   - to:
-                      id: to-0719
+                      id: to-96b3
                       uri: direct
                       parameters:
                         name: get-token
             otherwise:
-              id: otherwise-73de
+              id: otherwise-f831
               steps:
                 - log:
-                    id: log-0466
+                    id: log-277f
                     message: >-
                       Usando token existente:
                       ${exchangeProperty.globalAccessToken}
-        - setBody:
-            id: setBody-64b1
+        - setHeader:
+            id: setHeader-987f
+            name: Authorization
             expression:
               simple:
-                id: simple-aa41
+                id: simple-6042
+                expression: Bearer ${exchangeProperty.globalAccessToken}
+        - log:
+            id: log-518c
+            message: "Cabecera Authorization: ${header.Authorization}"
+        - to:
+            id: to-e89c
+            uri: https
+            parameters:
+              httpUri: >-
+                equipoivis.lms.sapsf.eu/learning/odatav4/searchStudent/v1/Students?httpMethod=GET&bridgeEndpoint=true
+        - setBody:
+            id: setBody-5b24
+            expression:
+              simple:
+                id: simple-cc21
                 expression: >-
                   {"status": "success", "token":
-                  "${exchangeProperty.globalAccessToken}"}
+                  "${exchangeProperty.globalAccessToken}", "students": ${body}}
         - log:
-            id: log-75c4
+            id: log-8340
             message: "Respuesta preparada: ${body}"
-        - marshal:
-            id: marshal-0071
-            json:
-              id: json-7ed5
-        - unmarshal:
-            id: unmarshal-e841
-            json:
-              id: json-1485
