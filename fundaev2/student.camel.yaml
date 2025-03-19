@@ -72,6 +72,13 @@
                 expression: >-
                   Math.ceil(exchange.getProperty('totalStudents', Integer.class)
                   / 500).intValue()
+        - setProperty:
+            id: init-results
+            name: allResults
+            expression:
+              simple:
+                id: simple-c5c7
+                expression: "[]"
         - loop:
             id: loop-415d
             expression:
@@ -88,7 +95,9 @@
                       expression: ${exchangeProperty.CamelLoopIndex * 500}
               - log:
                   id: log-825d
-                  message: Llamando API con offset=${header.offset}
+                  message: >-
+                    Llamando API con offset=${header.offset} y la iteración del
+                    loop es: ${exchangeProperty.CamelLoopIndex}
               - to:
                   id: to-a1a7
                   uri: https
