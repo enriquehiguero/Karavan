@@ -55,7 +55,17 @@
             uri: https
             parameters:
               httpUri: >-
-                equipoivis.lms.sapsf.eu/learning/odatav4/searchStudent/v1/Students?$top=1000&httpMethod=GET&bridgeEndpoint=true
+                equipoivis.lms.sapsf.eu/learning/odatav4/searchStudent/v1/Students?$count=true&httpMethod=GET&bridgeEndpoint=true
+        - setProperty:
+            id: set-prop-count
+            name: totalStudents
+            expression:
+              jsonpath:
+                id: jsonpath-count
+                expression: $['@odata.count']
+        - log:
+            id: log-prop-check
+            message: "Propiedad totalStudents: ${exchangeProperty.totalStudents}"
         - setBody:
             id: setBody-5b24
             expression:
