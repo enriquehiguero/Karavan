@@ -63,6 +63,38 @@
               jsonpath:
                 id: jsonpath-count
                 expression: $['@odata.count']
+        - setProperty:
+            id: set-total-pages
+            name: totalPages
+            expression:
+              groovy:
+                id: groovy-aef3
+                expression: >-
+                  Math.ceil(exchange.getProperty('totalStudents', Integer.class)
+                  / 500).intValue()
+        - loop:
+            id: loop-415d
+            expression:
+              simple:
+                id: simple-2cc1
+                expression: ${exchangeProperty.totalPages}
+            steps:
+              - setHeader:
+                  id: setHeader-8dde
+                  name: offset
+                  expression:
+                    simple:
+                      id: simple-be84
+                      expression: ${exchangeProperty.CamelLoopIndex * 500}
+              - log:
+                  id: log-825d
+                  message: Llamando API con offset=${header.offset}
+              - to:
+                  id: to-a1a7
+                  uri: https
+                  parameters:
+                    httpUri: >-
+                      equipoivis.lms.sapsf.eu/learning/odatav4/searchStudent/v1/Students?$skip=${header.offset}&httpMethod=GET&bridgeEndpoint=true
         - log:
             id: log-prop-check
             message: "Propiedad totalStudents: ${exchangeProperty.totalStudents}"
@@ -76,4 +108,4 @@
                   "${exchangeProperty.globalAccessToken}", "students": ${body}}
         - log:
             id: log-8340
-            message: "Respuesta preparada: ${body}"
+            message: TOTAL ..... ${exchangeProperty.totalPages}
