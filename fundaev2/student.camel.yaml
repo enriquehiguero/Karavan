@@ -50,12 +50,15 @@
         - log:
             id: log-518c
             message: "Cabecera Authorization: ${header.Authorization}"
-        - to:
+        - toD:
             id: to-e89c
             uri: https
             parameters:
               httpUri: >-
-                equipoivis.lms.sapsf.eu/learning/odatav4/searchStudent/v1/Students?$count=true&httpMethod=GET&bridgeEndpoint=true
+                ${properties:lms.base_url}${properties:lms.endPoint_students}?$count=true&httpMethod=GET&bridgeEndpoint=true
+        - log:
+            id: log-body
+            message: "Cuerpo recibido: ${body}"
         - setProperty:
             id: set-prop-count
             name: totalStudents
@@ -63,6 +66,9 @@
               jsonpath:
                 id: jsonpath-count
                 expression: $['@odata.count']
+        - log:
+            id: log-total-students
+            message: "Total estudiantes: ${exchangeProperty.totalStudents}"
         - setProperty:
             id: set-total-pages
             name: totalPages
@@ -70,43 +76,154 @@
               groovy:
                 id: groovy-aef3
                 expression: >-
-                  Math.ceil(exchange.getProperty('totalStudents', Integer.class)
-                  / 500).intValue()
-        - setProperty:
-            id: init-results
-            name: allResults
-            expression:
-              simple:
-                id: simple-c5c7
-                expression: "[]"
-        - loop:
-            id: loop-415d
-            expression:
-              simple:
-                id: simple-2cc1
-                expression: ${exchangeProperty.totalPages}
-            steps:
-              - setHeader:
-                  id: setHeader-8dde
-                  name: offset
-                  expression:
-                    simple:
-                      id: simple-be84
-                      expression: ${exchangeProperty.CamelLoopIndex * 500}
-              - log:
-                  id: log-825d
-                  message: >-
-                    Llamando API con offset=${header.offset} y la iteración del
-                    loop es: ${exchangeProperty.CamelLoopIndex}
-              - to:
-                  id: to-a1a7
-                  uri: https
-                  parameters:
-                    httpUri: >-
-                      equipoivis.lms.sapsf.eu/learning/odatav4/searchStudent/v1/Students?$skip=${header.offset}&httpMethod=GET&bridgeEndpoint=true
+                  def totalStudents = exchange.getProperty('totalStudents',
+                  Integer.class); return totalStudents != null ?
+                  Math.ceil(totalStudents / 500).intValue() : 0
         - log:
-            id: log-prop-check
-            message: "Propiedad totalStudents: ${exchangeProperty.totalStudents}"
+            id: log-total-pages
+            message: "Total páginas: ${exchangeProperty.totalPages}"
+        - setProperty:
+            id: init-preview-results
+            name: previewResults
+            expression:
+              groovy:
+                id: groovy-init-preview
+                expression: new java.util.ArrayList()
+        - choice:
+            id: check-pages
+            when:
+              - id: when-pages
+                expression:
+                  simple:
+                    id: simple-check-pages
+                    expression: ${exchangeProperty.totalPages} > 0
+                steps:
+                  - loop:
+                      id: loop-415d
+                      expression:
+                        simple:
+                          id: simple-2cc1
+                          expression: ${exchangeProperty.totalPages}
+                      steps:
+                        - log:
+                            id: log-loop-index
+                            message: >-
+                              Índice del loop:
+                              ${exchangeProperty.CamelLoopIndex}
+                        - setHeader:
+                            id: setHeader-8dde
+                            name: offset
+                            expression:
+                              groovy:
+                                id: groovy-offset
+                                expression: >-
+                                  exchange.getProperty('CamelLoopIndex',
+                                  Integer.class) * 500
+                        - log:
+                            id: log-offset
+                            message: "Valor de offset en header: ${header.offset}"
+                        - setProperty:
+                            id: set-uri
+                            name: dynamicUri
+                            expression:
+                              simple:
+                                id: simple-uri
+                                expression: >-
+                                  https://equipoivis.lms.sapsf.eu/learning/odatav4/searchStudent/v1/Students?$top=500&$skip=${header.offset}&httpMethod=GET&bridgeEndpoint=true
+                        - log:
+                            id: log-825d
+                            message: >-
+                              Llamando API con URL:
+                              ${exchangeProperty.dynamicUri}
+                        - toD:
+                            id: to-a1a7
+                            uri: ${exchangeProperty.dynamicUri}
+                        - log:
+                            id: log-body-after-request
+                            message: "Cuerpo recibido: ${body}"
+                        - unmarshal:
+                            id: unmarshal-json
+                            json:
+                              id: json-7840
+                              library: Jackson
+                        - setBody:
+                            id: extract-value
+                            expression:
+                              jsonpath:
+                                id: jsonpath-value
+                                expression: $.value
+                        - log:
+                            id: log-extracted-value
+                            message: "Lista extraída: ${body}"
+                        - log:
+                            id: log-batch-size
+                            message: "Tamaño del lote actual: ${body.size()}"
+                        - choice:
+                            id: check-iteration
+                            when:
+                              - id: when-first-two
+                                expression:
+                                  simple:
+                                    id: simple-check-iteration
+                                    expression: ${exchangeProperty.CamelLoopIndex} < 2
+                                steps:
+                                  - setProperty:
+                                      id: append-preview
+                                      name: previewResults
+                                      expression:
+                                        groovy:
+                                          id: groovy-append-preview
+                                          expression: >
+                                            def previewResults =
+                                            exchange.getProperty('previewResults',
+                                            List.class)
+
+                                            if (previewResults == null) {
+                                              previewResults = new java.util.ArrayList()
+                                              exchange.setProperty('previewResults', previewResults)
+                                            }
+
+                                            def response =
+                                            exchange.getIn().getBody(List.class)
+
+                                            if (response != null) {
+                                              previewResults.addAll(response)
+                                            }
+
+                                            return previewResults
+                        - log:
+                            id: log-process-batch
+                            message: "Procesando lote: ${body}"
+            otherwise:
+              id: otherwise-c05c
+              steps:
+                - log:
+                    id: log-no-pages
+                    message: No hay páginas para procesar (totalPages <= 0)
+        - log:
+            id: log-preview-results
+            message: >-
+              Estudiantes de las primeras dos iteraciones:
+              ${exchangeProperty.previewResults}
+        - setProperty:
+            id: set-preview-json
+            name: previewJson
+            expression:
+              simple:
+                id: simple-preview-json
+                expression: ${exchangeProperty.previewResults}
+        - marshal:
+            id: marshal-preview
+            json:
+              id: json-48f1
+              library: Jackson
+        - setProperty:
+            id: set-preview-json-string
+            name: previewJsonString
+            expression:
+              simple:
+                id: simple-preview-json-string
+                expression: ${body}
         - setBody:
             id: setBody-5b24
             expression:
@@ -114,7 +231,9 @@
                 id: simple-cc21
                 expression: >-
                   {"status": "success", "token":
-                  "${exchangeProperty.globalAccessToken}", "students": ${body}}
+                  "${exchangeProperty.globalAccessToken}", "previewStudents":
+                  ${exchangeProperty.previewJsonString}, "message": "Estudiantes
+                  procesados por lotes"}
         - log:
             id: log-8340
-            message: TOTAL ..... ${exchangeProperty.totalPages}
+            message: Procesamiento completado
