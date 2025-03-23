@@ -49,23 +49,69 @@
             expression:
               constant:
                 id: constant-c501
-        - toD:
-            id: to-20d8
-            uri: https
-            parameters:
-              httpUri: >-
-                ${properties:lms.base_url}${properties:lms.endPoint_token}?httpMethod=POST&bridgeEndpoint=true
-        - unmarshal:
-            id: unmarshal-989d
-            json:
-              id: json-88cd
-        - setProperty:
-            id: setProperty-6441
-            name: globalAccessToken
-            expression:
-              simple:
-                id: simple-0122
-                expression: ${body[access_token]}
-        - log:
-            id: log-e459
-            message: "Token guardado: ${exchangeProperty.globalAccessToken}"
+        - doTry:
+            id: doTry-93fe
+            doCatch:
+              - id: doCatch-0067
+                exception: java.lang.Exception
+                steps:
+                  - choice:
+                      id: choice-001
+                      when:
+                        - id: when-403
+                          expression:
+                            simple:
+                              id: simple-403
+                              expression: ${exception.message} contains '403'
+                          steps:
+                            - log:
+                                id: log-403
+                                message: >-
+                                  Error 403: No autorizado. Verifica
+                                  credenciales.
+                            - stop:
+                                id: stop-403
+                        - id: when-500
+                          expression:
+                            simple:
+                              id: simple-500
+                              expression: ${exception.message} contains '500'
+                          steps:
+                            - log:
+                                id: log-500
+                                message: "Error 500: Problema del servidor."
+                            - stop:
+                                id: stop-500
+                      otherwise:
+                        id: otherwise-001
+                        steps:
+                          - log:
+                              id: log-unknown
+                              message: "Error desconocido: ${exception.message}"
+            doFinally:
+              id: doFinally-b659
+              steps:
+                - log:
+                    id: log-0ccd
+                    message: "FIN: ${body}"
+            steps:
+              - toD:
+                  id: to-20d8
+                  uri: https
+                  parameters:
+                    httpUri: >-
+                      ${properties:lms.base_url}${properties:lms.endPoint_token}?httpMethod=POST&bridgeEndpoint=true
+              - unmarshal:
+                  id: unmarshal-989d
+                  json:
+                    id: json-88cd
+              - setProperty:
+                  id: setProperty-6441
+                  name: globalAccessToken
+                  expression:
+                    simple:
+                      id: simple-0122
+                      expression: ${body[access_token]}
+              - log:
+                  id: log-e459
+                  message: "Token guardado: ${exchangeProperty.globalAccessToken}"
