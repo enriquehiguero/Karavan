@@ -9,11 +9,13 @@
         - log:
             id: log-396c
             message: >-
-              Obteniendo token:
+              Obteniendo token: {"grant_type": "client_credentials", "scope":
+              {"userId": "${properties:lms.admin_user}", "companyId":
+              "${properties:sf.company_id}", "userType": "admin",
+              "resourceType": "learning_public_api"}}
 
-              {"grant_type": "client_credentials", "scope": {"userId":
-              "PLATEAU", "companyId": "${properties:sf.company_id}", "userType":
-              "admin", "resourceType": "learning_public_api"}}
+              La URL
+              es:${properties:lms.base_url}${properties:lms.endPoint_token}?httpMethod=POST&bridgeEndpoint=true
         - setHeader:
             id: setHeader-b437
             name: Content-Type
@@ -25,11 +27,9 @@
             id: setHeader-2ba3
             name: Authorization
             expression:
-              constant:
-                id: constant-3b6f
-                expression: >-
-                  Basic
-                  ZXF1aXBvaXZpczowOWMwN2ZjNGNmMGY1MmUwZDU5NWE5YmEyYTY2NGI2MWE5Y2IwNjI0YWM3ZTRhNzA0MjA3ZDBlMjUzM2NjNGNkMjUyNzM4MzdlMzZjMDk0YjNiZmY2MDIyMzI2NmYzMGM=
+              simple:
+                id: simple-67ba
+                expression: ${properties:lms.access_token}
         - setBody:
             id: setBody-8947
             expression:
@@ -37,8 +37,9 @@
                 id: simple-facb
                 expression: >-
                   {"grant_type": "client_credentials", "scope": {"userId":
-                  "PLATEAU", "companyId": "${properties:sf.company_id}",
-                  "userType": "admin", "resourceType": "learning_public_api"}}
+                  "${properties:lms.admin_user}", "companyId":
+                  "${properties:sf.company_id}", "userType": "admin",
+                  "resourceType": "learning_public_api"}}
         - log:
             id: log-d67d
             message: "mi body es: ${body}"
@@ -48,12 +49,12 @@
             expression:
               constant:
                 id: constant-c501
-        - to:
+        - toD:
             id: to-20d8
             uri: https
             parameters:
               httpUri: >-
-                equipoivis.lms.sapsf.eu/learning/oauth-api/rest/v1/token?httpMethod=POST&bridgeEndpoint=true
+                ${properties:lms.base_url}${properties:lms.endPoint_token}?httpMethod=POST&bridgeEndpoint=true
         - unmarshal:
             id: unmarshal-989d
             json:
