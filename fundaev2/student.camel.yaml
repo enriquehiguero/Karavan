@@ -212,6 +212,7 @@
                                         parameters:
                                           destinationType: queue
                                           destinationName: simpleQueue?exchangePattern=InOnly
+                                          clientId: artemis:61616
                   otherwise:
                     id: otherwise-c05c
                     steps:
@@ -252,6 +253,7 @@
       parameters:
         destinationType: queue
         destinationName: simpleQueue?concurrentConsumers=1
+        clientId: artemis:61616
       steps:
         - log:
             id: log-17e9
