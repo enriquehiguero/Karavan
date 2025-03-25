@@ -208,7 +208,8 @@
                                         id: to-803f
                                         uri: activemq
                                         parameters:
-                                          destinationName: process-student-mq
+                                          destinationName: >-
+                                            data001?username=artemis&password=artemis
                   otherwise:
                     id: otherwise-c05c
                     steps:
@@ -247,7 +248,7 @@
       id: from-e7d6
       uri: activemq
       parameters:
-        destinationName: process-student-mq
+        destinationName: data001?username=artemis&password=artemis
       steps:
         - log:
             id: log-f7da
