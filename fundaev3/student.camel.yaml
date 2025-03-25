@@ -5,7 +5,7 @@
         path: /studentV2
         to: direct:process-students
 - route:
-    id: process-students
+    id: get-students
     from:
       id: from-d0d1
       uri: direct
@@ -242,7 +242,7 @@
                   id: log-8340
                   message: Procesamiento completado
 - route:
-    id: route-9547
+    id: post-students
     nodePrefixId: route-2a7
     from:
       id: from-e7d6

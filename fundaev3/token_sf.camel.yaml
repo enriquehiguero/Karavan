@@ -12,7 +12,7 @@
               simple:
                 id: simple-fcda
                 expression: >-
-                  client_id=MzEzMWViMTUzMMDFlNWRhYzBmNw&user_id=ADMINT4S&token_url=https://api55.sapsf.eu/oauth/token&private_key=TUlJRXZRSUE
+                  client_id=${properties:sf.client_id}&user_id=${properties:sf.admin_user}&token_url=${properties:sf.base_url}${properties:sf.endPoint_token}&private_key=${properties:sf.private_key}
         - setHeader:
             id: setHeader-219d
             name: Content-Type
@@ -34,7 +34,7 @@
               simple:
                 id: simple-4ed2
                 expression: >-
-                  company_id=nttdataeurD&client_id=MzEzMWViMTUzMWE2YzhlNzJhMDFlNWRhYzBmNw&grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&user_id=ADMINT4S&assertion=PD9=
+                  company_id=${properties:sf.company_id}&client_id=${properties:sf.client_id}&grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&user_id=${properties:sf.admin_user}&assertion=PD9=
         - setHeader:
             id: setHeader-40c7
             name: Content-Type
