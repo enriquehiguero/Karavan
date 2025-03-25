@@ -1,0 +1,8 @@
+services:
+  fundaev3:
+    image: fundaev3
+    restart: always
+    ports:
+      - "8084:8080"
+    networks:
+      - karavan

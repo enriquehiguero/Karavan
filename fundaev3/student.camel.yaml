@@ -203,9 +203,12 @@
                                   steps:
                                     - log:
                                         id: log-student
-                                        message: >-
-                                          Procesando estudiante individual:
-                                          ${body}
+                                        message: Vuelta
+                                    - to:
+                                        id: to-803f
+                                        uri: activemq
+                                        parameters:
+                                          destinationName: process-student-mq
                   otherwise:
                     id: otherwise-c05c
                     steps:
@@ -237,3 +240,15 @@
               - log:
                   id: log-8340
                   message: Procesamiento completado
+- route:
+    id: route-9547
+    nodePrefixId: route-2a7
+    from:
+      id: from-e7d6
+      uri: activemq
+      parameters:
+        destinationName: process-student-mq
+      steps:
+        - log:
+            id: log-f7da
+            message: "El estudnate procesado es: ${body}"
