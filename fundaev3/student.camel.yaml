@@ -250,6 +250,84 @@
       parameters:
         destinationName: data001?username=artemis&password=artemis
       steps:
-        - log:
-            id: log-f7da
-            message: "El estudnate procesado es: ${body}"
+        - setProperty:
+            id: setProperty-345f
+            name: processedCount
+            expression:
+              groovy:
+                id: groovy-3ce7
+                expression: |-
+                  def count = exchange.getProperty('processedCount')
+                  count == null ? 0 : count.toInteger()
+        - choice:
+            id: choice-f13d
+            when:
+              - id: when-b482
+                expression:
+                  groovy:
+                    id: groovy-7b61
+                    expression: ${exchangeProperty.processedCount} == 0
+                steps:
+                  - unmarshal:
+                      id: unmarshal-0db9
+                  - setBody:
+                      id: map-to-ssff
+                      expression:
+                        groovy:
+                          id: groovy-fd8a
+                          expression: |-
+                            def participant = body
+                            [
+                                "d": [
+                                    "personIdExternal": participant.DNI,
+                                    "firstName": participant.Nombre,
+                                    "lastName": participant.Apellidos,
+                                    "dateOfBirth": participant.FechaNacimiento,
+                                    "gender": participant.Sexo,
+                                    "email": participant.Email,
+                                    "phone": participant.Telefono
+                                ]
+                            ]
+                  - marshal:
+                      id: marshal-json
+                      json:
+                        id: json-5678
+                        library: Jackson
+                  - setHeader:
+                      id: setHeader-auth
+                      name: Authorization
+                      expression:
+                        simple:
+                          id: simple-f2fd
+                          expression: ${exchangeProperty.globalAccessToken}
+                  - log:
+                      id: log-auth-header
+                      message: "Cabecera Authorization: ${header.Authorization}"
+                  - doTry:
+                      id: doTry-ssff
+                      doCatch:
+                        - id: doCatch-ssff
+                          exception: java.lang.Exception
+                          steps:
+                            - log:
+                                id: log-ssff-error
+                                message: "Error al enviar a SSFF: ${exception.message}"
+                      doFinally:
+                        id: doFinally-e5e6
+                      steps:
+                        - log:
+                            id: log-764f
+                            message: ${body}
+                        - toD:
+                            id: to-ssff
+                            uri: https
+                            parameters:
+                              httpUri: >-
+                                ${properties:ssff.base_url}/odata/v2/cust_lmsStudents
+                              httpMethod: POST
+                              bridgeEndpoint: true
+                        - log:
+                            id: log-ssff-response
+                            message: "Respuesta de SSFF: ${body}"
+            otherwise:
+              id: otherwise-7a44
