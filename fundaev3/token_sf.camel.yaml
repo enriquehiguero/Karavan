@@ -62,3 +62,10 @@
               - log:
                   id: log-f594
                   message: "Token response: ${body}"
+              - setProperty:
+                  id: setProperty-5f3c
+                  name: globalSSFFAccessToken
+                  expression:
+                    simple:
+                      id: simple-0122
+                      expression: Bearer ${body[access_token]}
