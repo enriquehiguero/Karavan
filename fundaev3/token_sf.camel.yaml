@@ -24,7 +24,8 @@
             id: to-4359
             uri: http
             parameters:
-              httpUri: api55.sapsf.eu/oauth/idp?httpMethod=POST
+              httpUri: >-
+                ${properties:sf.base_url}${properties:sf.endPoint_assertion}?httpMethod=POST
         - log:
             id: log-7b29
             message: "Cookie response: ${body}"
@@ -34,7 +35,7 @@
               simple:
                 id: simple-4ed2
                 expression: >-
-                  company_id=${properties:sf.company_id}&client_id=${properties:sf.client_id}&grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&user_id=${properties:sf.admin_user}&assertion=PD9=
+                  company_id=${properties:sf.company_id}&client_id=${properties:sf.client_id}&grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&user_id=${properties:sf.admin_user}&assertion=${body}
         - setHeader:
             id: setHeader-40c7
             name: Content-Type
@@ -56,7 +57,8 @@
                   id: to-edda
                   uri: http
                   parameters:
-                    httpUri: api55.sapsf.eu/oauth/token?httpMethod=POST
+                    httpUri: >-
+                      ${properties:sf.base_url}${properties:sf.endPoint_token}?httpMethod=POST
               - log:
                   id: log-f594
                   message: "Token response: ${body}"
