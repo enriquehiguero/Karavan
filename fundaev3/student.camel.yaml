@@ -260,74 +260,72 @@
                   def count = exchange.getProperty('processedCount')
                   count == null ? 0 : count.toInteger()
         - choice:
-            id: choice-f13d
+            id: choice-fb6d
             when:
-              - id: when-b482
+              - id: when-7ee3
                 expression:
                   groovy:
-                    id: groovy-7b61
-                    expression: ${exchangeProperty.processedCount} == 0
+                    id: groovy-15f7
+                    expression: exchange.getProperty('processedCount', Integer.class) == 0
                 steps:
+                  - log:
+                      id: log-9d55
+                      message: "Procesando el primer empleado: ${body}\""
                   - unmarshal:
-                      id: unmarshal-0db9
+                      id: unmarshal-5024
+                      json:
+                        id: json-c8f6
                   - setBody:
-                      id: map-to-ssff
+                      id: setBody-7984
                       expression:
                         groovy:
-                          id: groovy-fd8a
+                          id: groovy-7c23
                           expression: |-
                             def participant = body
                             [
-                                "d": [
-                                    "personIdExternal": participant.DNI,
-                                    "firstName": participant.Nombre,
-                                    "lastName": participant.Apellidos,
-                                    "dateOfBirth": participant.FechaNacimiento,
-                                    "gender": participant.Sexo,
-                                    "email": participant.Email,
-                                    "phone": participant.Telefono
-                                ]
+                            "d": [
+                                "personIdExternal": participant.DNI,
+                                "firstName": participant.Nombre,
+                                "lastName": participant.Apellidos,
+                                "dateOfBirth": participant.FechaNacimiento,
+                                "gender": participant.Sexo,
+                                "email": participant.Email,
+                                "phone": participant.Telefono
+                            ]
                             ]
                   - marshal:
-                      id: marshal-json
+                      id: marshal-114f
                       json:
-                        id: json-5678
-                        library: Jackson
+                        id: json-9085
                   - setHeader:
-                      id: setHeader-auth
-                      name: Authorization
+                      id: setHeader-4221
+                      name: Token SSFF
                       expression:
-                        simple:
-                          id: simple-f2fd
-                          expression: ${exchangeProperty.globalAccessToken}
+                        groovy:
+                          id: groovy-e06c
+                          expression: |
+                            ${exchangeProperty.globalSSFFAccessToken}
                   - log:
-                      id: log-auth-header
-                      message: "Cabecera Authorization: ${header.Authorization}"
-                  - doTry:
-                      id: doTry-ssff
-                      doCatch:
-                        - id: doCatch-ssff
-                          exception: java.lang.Exception
-                          steps:
-                            - log:
-                                id: log-ssff-error
-                                message: "Error al enviar a SSFF: ${exception.message}"
-                      doFinally:
-                        id: doFinally-e5e6
-                      steps:
-                        - log:
-                            id: log-764f
-                            message: ${body}
-                        - toD:
-                            id: to-ssff
-                            uri: https
-                            parameters:
-                              httpUri: >-
-                                ${properties:ssff.base_url}/odata/v2/cust_lmsStudents
-                              httpMethod: POST
-                              bridgeEndpoint: true
-                        - log:
-                            id: log-ssff-response
-                            message: "Respuesta de SSFF: ${body}"
+                      id: log-b3bc
+                      message: "Cabecera Authorization: ${header.Authorization}\""
+                      logName: Authorización
+                  - to:
+                      id: to-6b1b
+                      uri: https
+                      parameters:
+                        httpUri: >-
+                          ${properties:ssff.base_url}/odata/v2/cust_lmsStudents?bridgeEndpoint=true&httpMethod=POST
+                  - log:
+                      id: log-ssff-response
+                      message: "Respuesta de SSFF: ${body}"
+                  - setProperty:
+                      id: setProperty-c20c
+                      name: processedCount
+                      expression:
+                        groovy:
+                          id: groovy-b3c7
+                          expression: >-
+                            exchange.getProperty('processedCount',
+                            Integer.class) + 1
             otherwise:
-              id: otherwise-7a44
+              id: otherwise-8ad4

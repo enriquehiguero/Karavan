@@ -20,7 +20,7 @@
               simple:
                 id: simple-8954
                 expression: application/x-www-form-urlencoded
-        - to:
+        - toD:
             id: to-4359
             uri: http
             parameters:
@@ -53,7 +53,7 @@
                       id: log-1626
                       message: "Error en la ruta: ${exception.message}"
             steps:
-              - to:
+              - toD:
                   id: to-edda
                   uri: http
                   parameters:
