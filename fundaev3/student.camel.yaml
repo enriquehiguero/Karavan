@@ -266,6 +266,11 @@
                     id: groovy-15f7
                     expression: exchange.getProperty('processedCount', Integer.class) == 0
                 steps:
+                  - to:
+                      id: to-1055
+                      uri: direct
+                      parameters:
+                        name: get-token-sfsf
                   - log:
                       id: log-9d55
                       message: "Procesando el primer empleado: ${body}\""

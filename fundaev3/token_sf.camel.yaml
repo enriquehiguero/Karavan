@@ -4,7 +4,7 @@
       id: from-a938
       uri: direct
       parameters:
-        name: start
+        name: get-token-sfsf
       steps:
         - setBody:
             id: setBody-ecf8
