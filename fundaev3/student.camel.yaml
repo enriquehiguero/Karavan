@@ -177,7 +177,7 @@
                                       ${properties:lms.base_url}${properties:lms.endPoint_students}?$top=500&$skip=${header.offset}&httpMethod=GET&bridgeEndpoint=true
                               - log:
                                   id: log-body-after-request
-                                  message: "Cuerpo recibido: ${body}"
+                                  message: "Cuerpo recibido: "
                               - unmarshal:
                                   id: unmarshal-json
                                   json:
@@ -191,9 +191,7 @@
                                       expression: $.value
                               - log:
                                   id: log-extracted-value
-                                  message: |-
-                                    Lista extraída: ${body}
-                                    Tamaño del lote actual: ${body.size()}
+                                  message: "Tamaño del lote actual: ${body.size()}"
                               - split:
                                   id: split-students
                                   expression:
@@ -271,28 +269,40 @@
                   - log:
                       id: log-9d55
                       message: "Procesando el primer empleado: ${body}\""
-                  - unmarshal:
-                      id: unmarshal-5024
-                      json:
-                        id: json-c8f6
                   - setBody:
                       id: setBody-7984
                       expression:
                         groovy:
                           id: groovy-7c23
                           expression: |-
-                            def participant = body
-                            [
-                            "d": [
-                                "personIdExternal": participant.DNI,
-                                "firstName": participant.Nombre,
-                                "lastName": participant.Apellidos,
-                                "dateOfBirth": participant.FechaNacimiento,
-                                "gender": participant.Sexo,
-                                "email": participant.Email,
-                                "phone": participant.Telefono
-                            ]
-                            ]
+                            import groovy.json.JsonSlurper
+
+                                      // Verificar si el body es una cadena JSON y parsearlo
+                                      def body = exchange.in.body
+                                      if (body instanceof String) {
+                                          body = new JsonSlurper().parseText(body)
+                                      }
+
+                                      if (!(body instanceof Map)) {
+                                          throw new Exception("El body no es un objeto JSON válido: " + body)
+                                      }
+
+                                      return [
+                                        "d": [
+                                            "personIdExternal": body.get('DNI', ""),
+                                            "firstName": body.get('Nombre', ""),
+                                            "lastName": body.get('Apellidos', ""),
+                                            "dateOfBirth": body.get('FechaNacimiento', ""),
+                                            "gender": body.get('Sexo', ""),
+                                            "email": body.get('Email', ""),
+                                            "phone": body.get('Telefono', "")
+                                        ]
+                                      ]
+                            if (participant == null || participant.isEmpty()) {
+                                throw new Exception("El body no contiene datos válidos: " + participant)
+                            }
+
+                            return participant
                   - marshal:
                       id: marshal-114f
                       json:
