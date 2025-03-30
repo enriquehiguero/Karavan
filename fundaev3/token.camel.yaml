@@ -11,7 +11,7 @@
             message: >-
               Obteniendo token: {"grant_type": "client_credentials", "scope":
               {"userId": "${properties:lms.admin_user}", "companyId":
-              "${properties:sf.company_id}", "userType": "admin",
+              "${properties:lms.company_id}", "userType": "admin",
               "resourceType": "learning_public_api"}}
 
               La URL
@@ -38,7 +38,7 @@
                 expression: >-
                   {"grant_type": "client_credentials", "scope": {"userId":
                   "${properties:lms.admin_user}", "companyId":
-                  "${properties:sf.company_id}", "userType": "admin",
+                  "${properties:lms.company_id}", "userType": "admin",
                   "resourceType": "learning_public_api"}}
         - log:
             id: log-d67d

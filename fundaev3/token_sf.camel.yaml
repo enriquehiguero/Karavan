@@ -6,13 +6,17 @@
       parameters:
         name: get-token-sfsf
       steps:
+        - log:
+            id: log-4f0f
+            message: |
+              Llamada desde Students con BODY:  
         - setBody:
             id: setBody-ecf8
             expression:
               simple:
                 id: simple-fcda
                 expression: >-
-                  client_id=${properties:sf.client_id}&user_id=${properties:sf.admin_user}&token_url=${properties:sf.base_url}${properties:sf.endPoint_token}&private_key=${properties:sf.private_key}
+                  client_id=${properties:sf.client_id}&user_id=${properties:sf.admin_user}&token_url=https://${properties:sf.base_url}${properties:sf.endPoint_token}&private_key=${properties:sf.privatekey}
         - setHeader:
             id: setHeader-219d
             name: Content-Type
@@ -22,13 +26,16 @@
                 expression: application/x-www-form-urlencoded
         - toD:
             id: to-4359
-            uri: http
+            uri: https
             parameters:
               httpUri: >-
-                ${properties:sf.base_url}${properties:sf.endPoint_assertion}?httpMethod=POST
+                ${properties:sf.base_url}${properties:sf.endPoint_assertion}?httpMethod=POST&bridgeEndpoint=true
         - log:
             id: log-7b29
-            message: "Cookie response: ${body}"
+            message: >-
+              Cookie response: 
+
+              company_id=${properties:sf.company_id}&client_id=${properties:sf.client_id}&grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&user_id=${properties:sf.admin_user}&assertion=${body}
         - setBody:
             id: setBody-b4fc
             expression:
@@ -55,13 +62,17 @@
             steps:
               - toD:
                   id: to-edda
-                  uri: http
+                  uri: https
                   parameters:
                     httpUri: >-
-                      ${properties:sf.base_url}${properties:sf.endPoint_token}?httpMethod=POST
+                      ${properties:sf.base_url}${properties:sf.endPoint_token}?httpMethod=POST&bridgeEndpoint=true
+              - unmarshal:
+                  id: unmarshal-fbd3
+                  json:
+                    id: json-2dfb
               - log:
                   id: log-f594
-                  message: "Token response: ${body}"
+                  message: Bearer ${body[access_token]}
               - setProperty:
                   id: setProperty-5f3c
                   name: globalSSFFAccessToken
@@ -69,3 +80,7 @@
                     simple:
                       id: simple-0122
                       expression: Bearer ${body[access_token]}
+              - marshal:
+                  id: marshal-dbb5
+                  json:
+                    id: json-343a
