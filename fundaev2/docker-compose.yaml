@@ -1,8 +1,0 @@
-services:
-  fundaev2:
-    image: fundaev2
-    restart: always
-    ports:
-      - "8083:8080"
-    networks:
-      - karavan
