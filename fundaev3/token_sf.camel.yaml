@@ -8,8 +8,7 @@
       steps:
         - log:
             id: log-4f0f
-            message: |
-              Llamada desde Students con BODY:  
+            message: "Llamada desde Students con BODY:  "
         - setBody:
             id: setBody-ecf8
             expression:
@@ -24,63 +23,143 @@
               simple:
                 id: simple-8954
                 expression: application/x-www-form-urlencoded
-        - toD:
-            id: to-4359
-            uri: https
-            parameters:
-              httpUri: >-
-                ${properties:sf.base_url}${properties:sf.endPoint_assertion}?httpMethod=POST&bridgeEndpoint=true
-        - log:
-            id: log-7b29
-            message: >-
-              Cookie response: 
-
-              company_id=${properties:sf.company_id}&client_id=${properties:sf.client_id}&grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&user_id=${properties:sf.admin_user}&assertion=${body}
-        - setBody:
-            id: setBody-b4fc
-            expression:
-              simple:
-                id: simple-4ed2
-                expression: >-
-                  company_id=${properties:sf.company_id}&client_id=${properties:sf.client_id}&grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&user_id=${properties:sf.admin_user}&assertion=${body}
-        - setHeader:
-            id: setHeader-40c7
-            name: Content-Type
-            expression:
-              simple:
-                id: simple-04d9
-                expression: application/x-www-form-urlencoded
         - doTry:
-            id: doTry-880f
+            id: doTry-32d3
             doCatch:
-              - id: doCatch-459c
+              - id: doCatch-8890
                 exception: java.lang.Exception
                 steps:
-                  - log:
-                      id: log-1626
-                      message: "Error en la ruta: ${exception.message}"
+                  - choice:
+                      id: choice-c2a4
+                      when:
+                        - id: when-dcc1
+                          expression:
+                            simple:
+                              id: simple-a741
+                              expression: ${exception.message} contains '403'
+                          steps:
+                            - log:
+                                id: log-c40b
+                                message: >-
+                                  Error 403: No autorizado. Verifica
+                                  credenciales.
+                            - stop:
+                                id: stop-04e3
+                        - id: when-1543
+                          expression:
+                            simple:
+                              id: simple-10e6
+                              expression: ${exception.message} contains '500'
+                          steps:
+                            - log:
+                                id: log-91c1
+                                message: "Error 500: Problema del servidor."
+                            - stop:
+                                id: stop-a331
+                      otherwise:
+                        id: otherwise-9deb
+                        steps:
+                          - log:
+                              id: log-3e98
+                              message: "Error desconocido: ${exception.message}"
+            doFinally:
+              id: doFinally-3586
+              steps:
+                - log:
+                    id: log-cc76
+                    message: "FIN: ${body}"
             steps:
               - toD:
-                  id: to-edda
+                  id: to-4359
                   uri: https
                   parameters:
                     httpUri: >-
-                      ${properties:sf.base_url}${properties:sf.endPoint_token}?httpMethod=POST&bridgeEndpoint=true
-              - unmarshal:
-                  id: unmarshal-fbd3
-                  json:
-                    id: json-2dfb
+                      ${properties:sf.base_url}${properties:sf.endPoint_assertion}?httpMethod=POST&bridgeEndpoint=true
               - log:
-                  id: log-f594
-                  message: Bearer ${body[access_token]}
-              - setProperty:
-                  id: setProperty-5f3c
-                  name: globalSSFFAccessToken
+                  id: log-7b29
+                  message: >-
+                    Cookie response: 
+
+                    company_id=${properties:sf.company_id}&client_id=${properties:sf.client_id}&grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&user_id=${properties:sf.admin_user}&assertion=${body}
+              - setBody:
+                  id: setBody-b4fc
                   expression:
                     simple:
-                      id: simple-0122
-                      expression: Bearer ${body[access_token]}
-              - marshal:
-                  id: marshal-dbb5
-                  json:
-                    id: json-343a
+                      id: simple-4ed2
+                      expression: >-
+                        company_id=${properties:sf.company_id}&client_id=${properties:sf.client_id}&grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&user_id=${properties:sf.admin_user}&assertion=${body}
+              - setHeader:
+                  id: setHeader-40c7
+                  name: Content-Type
+                  expression:
+                    simple:
+                      id: simple-04d9
+                      expression: application/x-www-form-urlencoded
+              - doTry:
+                  id: doTry-880f
+                  doCatch:
+                    - id: doCatch-459c
+                      exception: java.lang.Exception
+                      steps:
+                        - choice:
+                            id: choice-deee
+                            when:
+                              - id: when-e910
+                                expression:
+                                  simple:
+                                    id: simple-afad
+                                    expression: ${exception.message} contains '403'
+                                steps:
+                                  - log:
+                                      id: log-1626
+                                      message: "Error en la ruta: ${exception.message}"
+                                  - stop:
+                                      id: stop-4d74
+                              - id: when-6f13
+                                expression:
+                                  simple:
+                                    id: simple-1c94
+                                    expression: ${exception.message} contains '500'
+                                steps:
+                                  - log:
+                                      id: log-d4e9
+                                      message: ${body}
+                                  - stop:
+                                      id: stop-0e6c
+                            otherwise:
+                              id: otherwise-7943
+                              steps:
+                                - log:
+                                    id: log-b98e
+                                    message: ${body}
+                  doFinally:
+                    id: doFinally-a199
+                    steps:
+                      - log:
+                          id: log-0d3f
+                          message: "FIN: ${body}"
+                  steps:
+                    - toD:
+                        id: to-edda
+                        uri: https
+                        parameters:
+                          httpUri: >-
+                            ${properties:sf.base_url}${properties:sf.endPoint_token}?httpMethod=POST&bridgeEndpoint=true
+                    - unmarshal:
+                        id: unmarshal-b80b
+                        json:
+                          id: json-9e73
+                    - log:
+                        id: log-f594
+                        message: "Token response: ${body}"
+                    - setProperty:
+                        id: setProperty-5f3c
+                        name: globalSSFFAccessToken
+                        expression:
+                          simple:
+                            id: simple-0122
+                            expression: Bearer ${body[access_token]}
+                    - marshal:
+                        id: marshal-6153
+                        json:
+                          id: json-49a3
