@@ -266,70 +266,102 @@
                     id: groovy-15f7
                     expression: exchange.getProperty('processedCount', Integer.class) == 0
                 steps:
-                  - to:
-                      id: to-1055
-                      uri: direct
-                      parameters:
-                        name: get-token-sfsf
                   - log:
                       id: log-9d55
                       message: "Procesando el primer empleado: ${body}\""
+                  - setProperty:
+                      id: setProperty-a933
+                      name: bodySSFF
+                      expression:
+                        groovy:
+                          id: groovy-b044
+                          expression: |-
+
+                            def mapping = [
+                                "externalCode": body.firstName,
+                                "externalName": body.lastName
+                            ]
+                            return mapping
                   - setBody:
                       id: setBody-7984
                       expression:
                         groovy:
                           id: groovy-7c23
                           expression: |-
-                            import groovy.json.JsonSlurper
 
-                                      // Verificar si el body es una cadena JSON y parsearlo
-                                      def body = exchange.in.body
-                                      if (body instanceof String) {
-                                          body = new JsonSlurper().parseText(body)
-                                      }
-
-                                      if (!(body instanceof Map)) {
-                                          throw new Exception("El body no es un objeto JSON válido: " + body)
-                                      }
-
-                                      return [
-                                        "d": [
-                                            "personIdExternal": body.get('DNI', ""),
-                                            "firstName": body.get('Nombre', ""),
-                                            "lastName": body.get('Apellidos', ""),
-                                            "dateOfBirth": body.get('FechaNacimiento', ""),
-                                            "gender": body.get('Sexo', ""),
-                                            "email": body.get('Email', ""),
-                                            "phone": body.get('Telefono', "")
-                                        ]
-                                      ]
-                            if (participant == null || participant.isEmpty()) {
-                                throw new Exception("El body no contiene datos válidos: " + participant)
-                            }
-
-                            return participant
+                            def mapping = [
+                                "personIdExternal": "",
+                                "firstName": body.firstName,
+                                "lastName": body.lastName,
+                                "dateOfBirth": "",
+                                "gender": "",
+                                "email": "",
+                                "phone": ""
+                            ]
+                            return mapping
+                  - log:
+                      id: log-af01
+                      message: "El nuevo BODY ES:   ${body}"
                   - marshal:
                       id: marshal-114f
                       json:
                         id: json-9085
+                  - to:
+                      id: to-1055
+                      uri: direct
+                      parameters:
+                        name: get-token-sfsf
+                  - log:
+                      id: log-3b0e
+                      message: >-
+                        Llegas????? con este token:
+                        ${exchangeProperty.globalSSFFAccessToken}
                   - setHeader:
-                      id: setHeader-4221
-                      name: Token SSFF
+                      id: setHeader-accept
+                      name: Accept
+                      expression:
+                        constant:
+                          id: constant-accept
+                          expression: application/json
+                  - setHeader:
+                      id: setHeader-content-type
+                      name: Content-Type
+                      expression:
+                        constant:
+                          id: constant-content-type
+                          expression: application/json
+                  - setHeader:
+                      id: setHeader-auth
+                      name: Authorization
                       expression:
                         groovy:
-                          id: groovy-e06c
-                          expression: |
-                            ${exchangeProperty.globalSSFFAccessToken}
+                          id: groovy-auth
+                          expression: exchange.getProperty('globalSSFFAccessToken')
                   - log:
-                      id: log-b3bc
-                      message: "Cabecera Authorization: ${header.Authorization}\""
-                      logName: Authorización
-                  - to:
+                      id: log-headers
+                      message: >-
+                        Headers preparados - Accept: ${header.Accept},
+                        Content-Type: ${header['Content-Type']}, Authorization:
+                        ${header.Authorization}
+                  - setBody:
+                      id: setBody-4a43
+                      expression:
+                        groovy:
+                          id: groovy-8d42
+                          expression: return exchange.getProperty('bodySSFF')
+                  - marshal:
+                      id: marshal-e0e3
+                      json:
+                        id: json-ce29
+                  - log:
+                      id: log-81b8
+                      message: "body recuperado de propiedad: ${body}"
+                  - toD:
                       id: to-6b1b
                       uri: https
                       parameters:
                         httpUri: >-
-                          ${properties:ssff.base_url}/odata/v2/cust_lmsStudents?bridgeEndpoint=true&httpMethod=POST
+                          ${properties:sf.base_url}/odata/v2/cust_lmsStudents?bridgeEndpoint=true&httpMethod=POST
                   - log:
                       id: log-ssff-response
                       message: "Respuesta de SSFF: ${body}"
