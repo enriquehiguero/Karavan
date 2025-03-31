@@ -282,23 +282,6 @@
                                 "externalName": body.lastName
                             ]
                             return mapping
-                  - setBody:
-                      id: setBody-7984
-                      expression:
-                        groovy:
-                          id: groovy-7c23
-                          expression: |-
-
-                            def mapping = [
-                                "personIdExternal": "",
-                                "firstName": body.firstName,
-                                "lastName": body.lastName,
-                                "dateOfBirth": "",
-                                "gender": "",
-                                "email": "",
-                                "phone": ""
-                            ]
-                            return mapping
                   - log:
                       id: log-af01
                       message: "El nuevo BODY ES:   ${body}"
