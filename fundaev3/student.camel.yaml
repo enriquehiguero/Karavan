@@ -275,13 +275,21 @@
                       expression:
                         groovy:
                           id: groovy-b044
-                          expression: |-
+                          expression: >+
+                            // Obtener la propiedad desde Apache Camel
+
+                            def baseUrl =
+                            exchange.getContext().resolvePropertyPlaceholders("{{sf.base_url}}")
+
 
                             def mapping = [
+                                "__metadata": [
+                                    "uri": baseUrl + "/odata/v2/cust_lmsStudents"
+                                ],
                                 "externalCode": body.firstName,
                                 "externalName": body.lastName
                             ]
-                            return mapping
+
                   - log:
                       id: log-af01
                       message: "El nuevo BODY ES:   ${body}"
@@ -299,27 +307,44 @@
                       message: >-
                         Llegas????? con este token:
                         ${exchangeProperty.globalSSFFAccessToken}
-                  - setHeader:
-                      id: setHeader-accept
-                      name: Accept
-                      expression:
-                        constant:
-                          id: constant-accept
-                          expression: application/json
-                  - setHeader:
-                      id: setHeader-content-type
-                      name: Content-Type
-                      expression:
-                        constant:
-                          id: constant-content-type
-                          expression: application/json
-                  - setHeader:
-                      id: setHeader-auth
-                      name: Authorization
+                  - script:
+                      id: script-5a42
                       expression:
                         groovy:
-                          id: groovy-auth
-                          expression: exchange.getProperty('globalSSFFAccessToken')
+                          id: groovy-dea5
+                          expression: >-
+                            import groovy.json.JsonOutput
+                             
+                            // Obtener el intercambio de Camel
+
+                            def inMessage = exchange.getIn()
+                             
+                            // Limpiar headers previos
+
+                            inMessage.removeHeaders("*")
+                             
+                            // Configurar headers necesarios
+
+                            inMessage.setHeader("Accept", "application/json")
+
+                            inMessage.setHeader("Content-Type",
+                            "application/json")
+                             
+                            // Obtener y establecer el token de autorización
+
+                            def authToken =
+                            exchange.getProperty("globalSSFFAccessToken")
+
+                            if (authToken) {
+                                inMessage.setHeader("Authorization", "${authToken}")
+                            } else {
+                                throw new Exception("El token de autenticación es nulo o no está disponible")
+                            }
+                             
+                            // Imprimir headers para verificar
+
+                            println "Headers enviados: " +
+                            JsonOutput.toJson(inMessage.getHeaders())
                   - log:
                       id: log-headers
                       message: >-
@@ -344,7 +369,7 @@
                       uri: https
                       parameters:
                         httpUri: >-
-                          ${properties:sf.base_url}/odata/v2/cust_lmsStudents?bridgeEndpoint=true&httpMethod=POST
+                          ${properties:sf.base_url}/odata/v2/upsert?bridgeEndpoint=true&httpMethod=POST
                   - log:
                       id: log-ssff-response
                       message: "Respuesta de SSFF: ${body}"
